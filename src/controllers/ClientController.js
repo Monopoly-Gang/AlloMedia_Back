@@ -3,19 +3,25 @@ const Restaurant = require("../models/Restaurant");
 
 
 const searchRestaurant = async (req,res) =>{
+    
     try{
+
+        // Extracting query params
 
         const {location, cuisineType, name } = req.query;
         const fieldsNumber = Object.keys(req.query).length;
-        const conditions = [];
-        console.log(fieldsNumber);
-        
 
+        if(fieldsNumber == 0) return res.status(403).json({message:"Forbidden"});
+        
+        // Defining the query conditions
+
+        const conditions = [];
+           
         if(location){
             conditions.push({address:location});
 
         }
-        
+      
         if(cuisineType){
             conditions.push({cuisineType:new RegExp(cuisineType,"i")})
 
@@ -24,42 +30,29 @@ const searchRestaurant = async (req,res) =>{
             conditions.push({name: new RegExp(name,"i")});
         }
 
-        let restaurants = {};
+        let restaurants;
 
-        if(fieldsNumber < 3){
-            restaurants = await Restaurant.find({
-                $or : conditions
-            })
+        // Query 
+
+        let query = {$and : conditions};
+        if(fieldsNumber < 3) query = {$or : conditions};
+
+        restaurants = await Restaurant.find(query);
+            
+        // Return response
+
+        if(restaurants.length > 0) {
+            return res.status(200).json(restaurants);
+        }
+        else{
+            return res.status(404).json({message:"No ressource was found"});
         }
         
-        else if(fieldsNumber == 3){
-             restaurants = await Restaurant.find({
-                $and : conditions
-            })
-        }
-        
-        res.json(restaurants);
-        
-
-        
-
-
-
-        // if()
-
-        // const restaurantName = req.query.restaurantName  || "";
-        // const cuisineType = req.query.cuisineType || "";
-        // const page = parseInt(req.query.page) || 1;
-
-        // const result = await Restaurant.find(
-        //     {
-        //         $or : [{name:new RegExp(city,"i")},{address: new RegExp(city,"i")}]
-        //     }
-        // );
-       console.log(restaurants);
     }
+
     catch(error){
         console.error(error);
+        return res.status(500).json({message:"Error searching restaurants"});
     }
 }
 
