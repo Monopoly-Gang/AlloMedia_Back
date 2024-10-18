@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const validateRequest = require("./middleware/requestValidator");
+const routes = require("./routes");
 
 const app = express();
 
@@ -15,5 +17,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("../public"));
+app.use(validateRequest);
+app.use("/api", routes);
 
 module.exports = app;
