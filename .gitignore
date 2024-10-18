@@ -16,3 +16,6 @@ Thumbs.db
 
 # Uploaded files
 uploads/
+
+# Restaurant seeder
+**/seedRestaurants.js
