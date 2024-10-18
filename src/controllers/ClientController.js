@@ -3,15 +3,23 @@ const Restaurant = require("../models/Restaurant");
 
 
 const searchRestaurant = async (req,res) =>{
-    
+
     try{
 
         // Extracting query params
 
         const {location, cuisineType, name } = req.query;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
         const fieldsNumber = Object.keys(req.query).length;
 
-        if(fieldsNumber == 0) return res.status(403).json({message:"Forbidden"});
+        if(fieldsNumber == 0 || page<1 || limit <0) return res.status(403).json({message:"Forbidden"});
+
+        // Calculating offset for pagination
+
+        let offset = (page-1) * limit;
         
         // Defining the query conditions
 
@@ -34,15 +42,24 @@ const searchRestaurant = async (req,res) =>{
 
         // Query 
 
-        let query = {$and : conditions};
-        if(fieldsNumber < 3) query = {$or : conditions};
 
-        restaurants = await Restaurant.find(query);
+        let query = {$and : conditions};
+        if(fieldsNumber < 5) query = {$or : conditions};
+
+        restaurants = await Restaurant.find(query).skip(offset).limit(limit);
+
+        // Total results
+
+        totalResults = await Restaurant.countDocuments(query);
             
         // Return response
 
         if(restaurants.length > 0) {
-            return res.status(200).json(restaurants);
+            return res.status(200).json({
+                restaurants,
+                totalResults,
+                currentPage:page
+            });
         }
         else{
             return res.status(404).json({message:"No ressource was found"});
