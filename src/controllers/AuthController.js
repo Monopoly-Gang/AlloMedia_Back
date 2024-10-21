@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const User = require('../models/User');
+const sendAuthTokens = require('../utils/sendAuthTokens');
+const SecurityManager = require('../utils/SecurityManager');
 const sendEmailVerification = require('../utils/sendEmailVerification');
 
 class AuthController {
@@ -44,6 +46,34 @@ class AuthController {
             const user = await User.findByIdAndUpdate(decoded.id, {isVerified: true}, {new: true});
             if (!user) return res.status(404).json({message: 'User not found'});
             res.status(200).json({message: 'Email verified successfully'});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async login(req, res) {
+        try {
+            // Check if user exists
+            const user = await User.findOne({email: req.body.email});
+            if (!user) return res.status(404).json({message: 'email not found'});
+
+            // Check if password is correct
+            const validPassword = await user.comparePassword(req.body.password);
+            if (!validPassword) return res.status(400).json({message: 'Invalid password'});
+
+            // Check if user is verified
+            if (!user.isVerified) {
+                const emailSent = await sendEmailVerification(user._id, user.email);
+                if (emailSent.error) return res.status(500).json({error: emailSent.error});
+                return res.status(401).json({message: 'Email not verified. Check your email for verification', errorCode: 'EMAIL_NOT_VERIFIED'});
+            }
+
+            // Check user fingerprint
+            if (await SecurityManager.isNewDeviceOrLocation(user.id, req))
+                return res.status(403).json({message: 'Unauthorized device or location', errorCode: 'UNAUTHORIZED_DEVICE'});
+
+            return await sendAuthTokens(res, {id: user._id, roles: user.roles});
+
         } catch (error) {
             res.status(500).json({error: error.message});
         }
