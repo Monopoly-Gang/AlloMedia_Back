@@ -18,7 +18,7 @@ const menuItemValidationSchema = Joi.object({
     .messages({
       'string.uri': `"image" should be a valid URL`
     }),
-    restaurant: Joi.string().regex(/^[0-9a-fA-F]$/).required() 
+    restaurant: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required() 
         .messages({
         'string.pattern.base': `"restaurant" should be a valid MongoDB ObjectId`,
         'any.required': `"restaurant" is a required field`
