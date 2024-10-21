@@ -24,18 +24,31 @@ const getRestaurants = async (req, res) => {
  */
 const createRestaurant = async (req, res) => {
     try {
-        const validation = createRestoValidation(req.body);
+
+        // if (!req.file) {
+        //     return sendResponse(res, 400, null, 'Image file is required');
+        // }
+
+        const data = {
+            ...req.body,
+            logo : req.files['logo'] ? req.files['logo'][0].filename  : null,
+            banner : req.files['banner'] ? req.files['banner'][0].filename  : null
+        };
+        console.log('Data:', data);
+
+        const validation = createRestoValidation(data);
         if (validation.error) {
             return sendResponse(res, 400, null, validation.error.details[0].message);
         }
 
-        const newRestaurant = await Restaurant.create(req.body);
+        const newRestaurant = await Restaurant.create(data);
         return sendResponse(res, 201, newRestaurant);
     } catch (error) {
         console.error('Error creating restaurant:', error);
         return sendResponse(res, 500, null, 'Failed to create restaurant');
     }
 };
+
 
 /**
  * Update an existing restaurant
@@ -45,15 +58,21 @@ const createRestaurant = async (req, res) => {
 const updateRestaurant = async (req, res) => {
     try {
         const { _id } = req.params;
+
+        const data={
+            ...req.body,
+            logo : req.files['logo'] ? req.files['logo'][0].filename  : null,
+            banner : req.files['banner'] ? req.files['banner'][0].filename  : null
+        }
         
-        const validation = createRestoValidation(req.body);
+        const validation = createRestoValidation(data);
         if (validation.error) {
             return sendResponse(res, 400, null, validation.error.details[0].message);
         }
 
         const updatedRestaurant = await Restaurant.findByIdAndUpdate(
             _id,
-            req.body,
+            data,
             { new: true, runValidators: true }
         );
 
@@ -97,8 +116,3 @@ module.exports = {
     updateRestaurant,
     deleteRestaurant
 };
-
-
-
-
-

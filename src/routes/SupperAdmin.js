@@ -3,9 +3,20 @@ const router = express.Router();
 const RestoController = require('../controllers/SupperAdmin/RestoController');
 const RestaurantRequestController = require('../controllers/SupperAdmin/RestaurantRequestController');
 
+const upload = require('../services/Multer');
+
 router.get('/', RestoController.getRestaurants);
-router.post('/createResto', RestoController.createRestaurant);
-router.put('/updateResto/:_id', RestoController.updateRestaurant);
+router.post('/createResto', upload("uploads/restos").fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
+]), RestoController.createRestaurant);
+
+
+router.put('/updateResto/:_id', upload("uploads/restos").fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
+]), RestoController.updateRestaurant);
+
 router.delete('/deleteResto/:_id', RestoController.deleteRestaurant);
 
 // get all restos for approval
