@@ -1,9 +1,10 @@
 const _ = require('lodash');
 const User = require('../models/User');
-const sendOTPMail = require('../utils/sendOTPMail');
-const getRedisClient = require('../config/redis');
-const sendAuthTokens = require('../utils/sendAuthTokens');
+const jwtService = require('../services/jwtService');
 const SecurityManager = require('../utils/SecurityManager');
+const getRedisClient = require('../config/redis');
+const sendOTPMail = require('../utils/sendOTPMail');
+const sendAuthTokens = require('../utils/sendAuthTokens');
 const sendEmailVerification = require('../utils/sendEmailVerification');
 
 class AuthController {
@@ -105,6 +106,15 @@ class AuthController {
             await redis.del(req.body.otp);
             await SecurityManager.updateLoginHistory(userId, req);
             return sendAuthTokens(res, {id: user._id});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async refreshToken(req, res) {
+        try {
+            const accessToken = jwtService.generateToken(req.decoded.id, 30 * 60);
+            res.status(200).json({accessToken});
         } catch (error) {
             res.status(500).json({error: error.message});
         }

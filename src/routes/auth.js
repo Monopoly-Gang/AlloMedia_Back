@@ -9,6 +9,7 @@ router.post("/send-email-verification", AuthController.sendEmailVerification);
 router.post("/login", AuthController.login);
 router.post("/send-otp", AuthController.sendOtp);
 router.post("/verify-otp", AuthController.verifyOtp);
+router.get("/refresh-token", tokenValidator.validateRefreshToken, AuthController.refreshToken);
 router.get("/logout", tokenValidator.validateRefreshToken, AuthController.logout);
 
 module.exports = router;
