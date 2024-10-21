@@ -26,6 +26,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^8.7.1",
     "nodemailer": "^6.9.15",
+    "redis": "^4.7.0",
     "ua-parser-js": "^1.0.39"
   }
 }

@@ -7,5 +7,7 @@ router.post("/register-client", AuthController.registerClient);
 router.get("/verify-email", tokenValidator.validateQuery, AuthController.verifyEmail);
 router.post("/send-email-verification", AuthController.sendEmailVerification);
 router.post("/login", AuthController.login);
+router.post("/send-otp", AuthController.sendOtp);
+router.post("/verify-otp", AuthController.verifyOtp);
 
 module.exports = router;
