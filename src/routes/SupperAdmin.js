@@ -3,6 +3,9 @@ const router = express.Router();
 const RestoController = require('../controllers/SupperAdmin/RestoController');
 const RestaurantRequestController = require('../controllers/SupperAdmin/RestaurantRequestController');
 
+const inputValidator = require("../middleware/inputValidator");
+
+
 const upload = require('../services/Multer');
 
 router.get('/', RestoController.getRestaurants);
@@ -25,6 +28,8 @@ router.get('/restosForApproval',RestaurantRequestController.getRestaurants );
 router.put('/approveRestaurant/:_id', RestaurantRequestController.approveRestaurant);
 // refuse a restaurant
 router.delete('/refuseRestaurant/:_id', RestaurantRequestController.refuseRestaurant);
+
+
 
 
 module.exports = router; // Utiliser module.exports
