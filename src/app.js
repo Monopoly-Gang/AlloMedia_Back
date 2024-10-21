@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require('express');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const routes=require('./routes');
 
 const app = express();
 
@@ -16,8 +17,5 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("../public"));
 
-app.use('/Resto', require('./routes/SupperAdmin')); // OK avec require
-app.get('/', (req, res) => {
-    res.send('Hello!');
-});
+app.use("/api",routes );
 module.exports = app;

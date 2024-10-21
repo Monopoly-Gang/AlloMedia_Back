@@ -1,6 +1,6 @@
-const Restaurant = require("../models/Restaurant");
-const { createRestoValidation } = require("../validation/SupperAdminValidation");
-const { sendResponse } = require("../utils/sendResponse");
+const Restaurant = require("../../models/Restaurant");
+const { createRestoValidation } = require("../../validation/SupperAdminValidation");
+const { sendResponse } = require("../../utils/sendResponse");
 
 /**
  * Get all restaurants
@@ -97,5 +97,22 @@ module.exports = {
     updateRestaurant,
     deleteRestaurant
 };
+
+
+
+const aproveResto=async(req,res)=>{
+    const{_id}=req.params;
+   try{
+       if(_id) sendResponse(res,400,null,"This resto not found")
+           await  Restaurant.findByIdAndUpdate(_id,
+               isApproved=true,
+           { new: true, runValidators: true }
+               );
+
+   }catch(error){
+    return sendResponse(res, 500, null, 'Failed to aprove resto');
+   }
+
+}
 
 

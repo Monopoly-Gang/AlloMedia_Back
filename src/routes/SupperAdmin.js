@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const SupperAdminController = require('../controllers/SupperAdminController');
+const SupperAdminController = require('../controllers/SupperAdmin/RestoController');
 
 router.get('/', SupperAdminController.getRestaurants);
 router.post('/createResto', SupperAdminController.createRestaurant);
