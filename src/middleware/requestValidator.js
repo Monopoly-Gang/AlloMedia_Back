@@ -9,6 +9,13 @@ async function validateRequest(req, res, next) {
                 ['fullName', 'email', 'password', 'phoneNumber', 'address']
             );
             break;
+        case "/api/auth/login":
+            if (!req.body.email || !req.body.password) {
+                reqValidation = {isValid: false, msg: 'Email and password are required'};
+            } else {
+                reqValidation = {isValid: true};
+            }
+            break;
         default:
             reqValidation = {isValid: true};
     }
