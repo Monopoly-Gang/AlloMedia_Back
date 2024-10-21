@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const User = require('../models/User');
+const sendOTPMail = require('../utils/sendOTPMail');
+const getRedisClient = require('../config/redis');
 const sendAuthTokens = require('../utils/sendAuthTokens');
 const SecurityManager = require('../utils/SecurityManager');
 const sendEmailVerification = require('../utils/sendEmailVerification');
@@ -65,15 +67,44 @@ class AuthController {
             if (!user.isVerified) {
                 const emailSent = await sendEmailVerification(user._id, user.email);
                 if (emailSent.error) return res.status(500).json({error: emailSent.error});
-                return res.status(401).json({message: 'Email not verified. Check your email for verification', errorCode: 'EMAIL_NOT_VERIFIED'});
+                return res.status(401).json({message: 'Email not verified. Check your email for verification'});
             }
 
             // Check user fingerprint
-            if (await SecurityManager.isNewDeviceOrLocation(user.id, req))
-                return res.status(403).json({message: 'Unauthorized device or location', errorCode: 'UNAUTHORIZED_DEVICE'});
+            if (await SecurityManager.isNewDeviceOrLocation(user.id, req)) {
+                const otpSent = await sendOTPMail(user);
+                if (otpSent.error) return res.status(500).json({error: otpSent.error});
+                return res.status(401).json({message: 'New device or location detected. Check your email for OTP verification'});
+            }
 
-            return await sendAuthTokens(res, {id: user._id, roles: user.roles});
+            return await sendAuthTokens(res, {id: user._id});
 
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async sendOtp(req, res) {
+        try {
+            const user = await User.findOne({email: req.body.email});
+            if (!user) return res.status(404).json({message: 'User not found'});
+            const otpSent = await sendOTPMail(user);
+            if (otpSent.error) return res.status(500).json({error: otpSent.error});
+            res.status(200).json({message: 'OTP sent successfully'});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async verifyOtp(req, res) {
+        try {
+            const redis = await getRedisClient();
+            const userId = await redis.get(req.body.otp);
+            if (!userId) return res.status(400).json({error: 'Invalid or expired OTP'});
+            const user = await User.findById(userId);
+            await redis.del(req.body.otp);
+            await SecurityManager.updateLoginHistory(userId, req);
+            return sendAuthTokens(res, {id: user._id});
         } catch (error) {
             res.status(500).json({error: error.message});
         }

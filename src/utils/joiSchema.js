@@ -45,10 +45,18 @@ const schemas = {
         'string.empty': 'Address is not allowed to be empty',
         'any.required': 'Address is required'
     }),
+    otp: Joi.string()
+        .required()
+        .pattern(new RegExp('^[0-9]{4}$'))
+        .messages({
+        'string.empty': 'OTP is not allowed to be empty',
+        'any.required': 'OTP is required',
+        'string.pattern.base': 'OTP must be a 4-digit number'
+    })
 };
 
 module.exports = (...fields) => {
     const genSchema = {};
-    fields.forEach(field => genSchema[field] = schemas[field]);
+    fields.forEach(field => genSchema[field] = schemas[field] || Joi.string().required());
     return Joi.object(genSchema);
 }
