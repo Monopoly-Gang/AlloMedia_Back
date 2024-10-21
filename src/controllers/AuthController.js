@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const User = require('../models/User');
+const path = require('path');
+const mailService = require('../services/mailService');
 const jwtService = require('../services/jwtService');
 const SecurityManager = require('../utils/SecurityManager');
 const getRedisClient = require('../config/redis');
@@ -11,7 +13,7 @@ class AuthController {
     async registerClient(req, res) {
         try {
             // Check for unique email
-            const emailExists = await User.findOne({ email: req.body.email });
+            const emailExists = await User.findOne({email: req.body.email});
             if (emailExists) return res.status(400).json({message: 'Email already exists'});
 
             // Create new user
@@ -41,7 +43,7 @@ class AuthController {
         }
     }
 
-    async verifyEmail (req, res) {
+    async verifyEmail(req, res) {
         try {
             const decoded = req.decoded;
 
@@ -56,6 +58,9 @@ class AuthController {
 
     async login(req, res) {
         try {
+            if (!req.body.email || !req.body.password)
+                return res.status(400).json({message: 'Email and password are required'});
+
             // Check if user exists
             const user = await User.findOne({email: req.body.email});
             if (!user) return res.status(404).json({message: 'email not found'});
@@ -124,6 +129,50 @@ class AuthController {
         try {
             res.clearCookie('refreshToken');
             res.status(200).json({message: 'Logout successful'});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async forgotPassword(req, res) {
+        try {
+            const user = await User.findOne({email: req.body.email});
+            if (!user) return res.status(404).json({message: 'User not found'});
+
+            const token = jwtService.generateToken(user._id, 600);
+            const emailSent = await mailService.send(
+                user.email,
+                'Reset Password',
+                path.join(__dirname, '../views/mail/reset-password.ejs'),
+                {link: `${process.env.FRONT_APP_HOST}/reset-password?token=${token}`}
+            );
+            if (emailSent.error) return res.status(500).json({error: emailSent.error});
+            res.status(200).json({message: 'Reset password link sent successfully'});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async verifyResetPassword(req, res) {
+        try {
+            const decoded = req.decoded;
+            const user = await User.findById(decoded.id);
+            if (!user) return res.status(404).json({message: 'User not found'});
+            const token = jwtService.generateToken(user._id, 300);
+            res.status(200).json({token});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async resetPassword(req, res) {
+        try {
+            const decoded = req.decoded;
+            const user = await User.findById(decoded.id);
+            if (!user) return res.status(404).json({message: 'User not found'});
+            user.password = req.body.password;
+            await user.save();
+            res.status(200).json({message: 'Password reset successfully'});
         } catch (error) {
             res.status(500).json({error: error.message});
         }
