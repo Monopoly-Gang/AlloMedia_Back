@@ -46,6 +46,12 @@ router.post(
     inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address',"role"]),
     UserManagementController.createUser
 );
+router.put('/users/update/:_id',  inputValidator(
+    ['fullName', 'email', 'password', 'phoneNumber', 'address',"role"]),
+    UserManagementController.updateUser
+);
+
+router.delete('/users/delete/:_id', UserManagementController.deleteUser);
 
 module.exports = router; // Utiliser module.exports
  

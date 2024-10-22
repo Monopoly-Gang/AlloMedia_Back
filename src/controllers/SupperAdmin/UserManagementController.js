@@ -88,7 +88,79 @@ const createUser = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendResponse(res, 422, null, 'Validation failed', errors.array());
+        }
+
+        const userId = req.params._id;
+        const { fullName, email, password, phoneNumber, address } = req.body;
+
+        // Find user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return sendResponse(res, 404, null, 'User not found');
+        }
+
+        // Check if the email is being updated and if it already exists for another user
+        if (email && email.toLowerCase() !== user.email.toLowerCase()) {
+            const emailExists = await User.findOne({ 
+                email: { $regex: new RegExp(`^${email}$`, 'i') } 
+            });
+            if (emailExists) {
+                return sendResponse(res, 409, null, 'Email already registered by another user');
+            }
+        }
+
+        // Update fields, hash password if it’s being updated
+        if (password) {
+            const saltRounds = 12;
+            user.password = await bcrypt.hash(password, saltRounds);
+        }
+
+        user.fullName = fullName ? fullName.trim() : user.fullName;
+        user.email = email ? email.toLowerCase() : user.email;
+        user.phoneNumber = phoneNumber ? phoneNumber.replace(/\s+/g, '') : user.phoneNumber;
+        user.address = address ? address.trim() : user.address;
+        user.updatedAt = new Date();
+
+        await user.save();
+
+        // Remove password from the response
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        return sendResponse(res, 200, userResponse, 'User updated successfully');
+
+    } catch (error) {
+        console.error('Error updating user:', error);
+        return sendResponse(res, 500, null, 'Failed to update user');
+    }
+};
+
+const deleteUser = async (req, res) => {
+    try {
+        const userId = req.params._id;
+
+        // Find the user by ID and delete
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) {
+            return sendResponse(res, 404, null, 'User not found');
+        }
+
+        return sendResponse(res, 200, null, 'User deleted successfully');
+        
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        return sendResponse(res, 500, null, 'Failed to delete user');
+    }
+};
+
 module.exports = {
     getUsers,
-    createUser
+    createUser,
+    updateUser,   // Export the update function
+    deleteUser    // Export the delete function
 };
