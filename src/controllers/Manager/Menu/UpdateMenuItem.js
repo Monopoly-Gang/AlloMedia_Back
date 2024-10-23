@@ -2,19 +2,26 @@ const express = require('express');
 const MenuItem = require('../../../models/MenuItem');
 const ValidateMenu = require('../../../services/Menu/Validation');
 
-async function UpdateItem(req, res, next) {
+async function UpdateMenuItem(req, res, next) {
     try {
-        const { error } = await ValidateMenu(req.body);
+        const { error } = ValidateMenu.UpdatemenuItemValidationSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
+ 
+        const { id, name, description, price, restaurant } = req.body;
 
-        const { id } = req.params; 
-        const { name, description, price, image, Restrorant_id } = req.body;
+        if (!id) {
+            return res.status(400).json({ message: 'Menu item ID is required' });
+        }
 
-        const updatedItem = await MenuItem.findByIdAndUpdate(id, {
-            name, description, price, image, restaurant: Restrorant_id
-        }, { new: true });
+        const updateData = { name, description, price };
+        
+        if (req.file) {
+            updateData.image = req.file.path;
+        }
+
+        const updatedItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
         
         if (!updatedItem) {
             return res.status(404).json({ message: 'Item not found' });
@@ -26,3 +33,6 @@ async function UpdateItem(req, res, next) {
         return res.status(500).json({ message: 'Internal server error', error });
     }
 }
+
+
+module.exports = UpdateMenuItem;

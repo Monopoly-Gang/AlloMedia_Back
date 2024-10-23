@@ -6,6 +6,5 @@ const Upload = require('../middleware/Multer');
 
 // Define your routes
 Router.post('/CreateMenuItem', Upload("uploads/MenuItems" , "image"), CreateMenuItem);
-// Router.get('/UpdateMenuItem', UpdateMenuItem )
+Router.post('/UpdateMenuItem',Upload("uploads/MenuItems" , "image"), UpdateMenuItem )
 module.exports = Router;
-

@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 async function CreateMenuItem(req, res, next) {
     try {
         
-        const {error} = ValidateMenu.validate(req.body); 
+        const {error} = ValidateMenu.menuItemValidationSchema.validate(req.body); 
         res.status(200);  
         if (error) {
             return res.status(400).json({ message: error });
@@ -19,7 +19,7 @@ async function CreateMenuItem(req, res, next) {
         if (!req.file) {
             image = "https://example.com/logo.png"
         }else{
-            image = req.file.filename;
+            image = req.file.path;
         }
         const id =new mongoose.Types.ObjectId(restaurant)
         const Item = await MenuItem.findOne({ name , restaurant})
