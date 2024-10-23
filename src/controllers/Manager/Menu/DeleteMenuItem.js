@@ -1,12 +1,9 @@
-const express = require('express');
 const MenuItem = require('../../../models/MenuItem');
-const ValidateMenu = require('../../../services/Menu/Validation');
 
 async function DeleteItem(req, res, next) {
     try {
-        const { id } = req.params; // Item ID from the URL parameters
+        const { id } = req.body; 
 
-        // Find the item by ID and delete it
         const deletedItem = await MenuItem.findByIdAndDelete(id);
 
         if (!deletedItem) {
@@ -19,3 +16,5 @@ async function DeleteItem(req, res, next) {
         return res.status(500).json({ message: 'Internal server error', error });
     }
 }
+
+module.exports = DeleteItem;
