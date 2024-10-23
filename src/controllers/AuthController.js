@@ -71,7 +71,7 @@ class AuthController {
                 return res.status(401).json({message: 'New device or location detected. Check your email for OTP verification'});
             }
 
-            return await sendAuthTokens(res, {id: user._id});
+            return await sendAuthTokens(res, {id: user._id, role: user.role});
 
         } catch (error) {
             res.status(500).json({error: error.message});
@@ -98,7 +98,7 @@ class AuthController {
             const user = await User.findById(userId);
             await redis.del(req.body.otp);
             await SecurityManager.updateLoginHistory(userId, req);
-            return sendAuthTokens(res, {id: user._id});
+            return sendAuthTokens(res, {id: user._id, role: user.role});
         } catch (error) {
             res.status(500).json({error: error.message});
         }
