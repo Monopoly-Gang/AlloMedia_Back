@@ -1,8 +1,14 @@
 const MenuItem = require('../../../models/MenuItem');
+const { DeleteMenuItemValidationSchema } = require('../../../services/Menu/Validation');
 
 async function DeleteItem(req, res, next) {
     try {
         const { id } = req.body; 
+
+        const { error } = DeleteMenuItemValidationSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
 
         const deletedItem = await MenuItem.findByIdAndDelete(id);
 

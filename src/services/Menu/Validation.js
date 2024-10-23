@@ -51,5 +51,12 @@ const UpdatemenuItemValidationSchema = Joi.object({
       'any.required': `"id" is a required field`
     })
 });
+const DeleteMenuItemValidationSchema = Joi.object({
+  id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+    .messages({
+      'string.pattern.base': `"id" should be a valid MongoDB ObjectId`,
+      'any.required': `"id" is a required field`
+    })
+});
 
-module.exports = { menuItemValidationSchema, UpdatemenuItemValidationSchema };
+module.exports = { menuItemValidationSchema, UpdatemenuItemValidationSchema ,DeleteMenuItemValidationSchema};
