@@ -30,7 +30,6 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: [true, 'Phone number is required'],
-        unique: true,
         validate: {
             validator: function(v) {
                 return /^\+\d{1,3}\d{4,14}$/.test(v);
