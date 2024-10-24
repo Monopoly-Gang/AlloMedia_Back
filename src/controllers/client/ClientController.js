@@ -1,5 +1,5 @@
-const User = require("../models/User");
-const Restaurant = require("../models/Restaurant");
+const User = require("../../models/User");
+const Restaurant = require("../../models/Restaurant");
 
 
 const searchRestaurant = async (req,res) =>{
@@ -50,7 +50,7 @@ const searchRestaurant = async (req,res) =>{
 
         // Total results
 
-        totalResults = await Restaurant.countDocuments(query);
+        const totalResults = await Restaurant.countDocuments(query);
             
         // Return response
 
