@@ -1,74 +1,51 @@
 const Restaurant = require("../../models/Restaurant");
 const { createRestoValidation } = require("../../validation/SupperAdminValidation");
 const { sendResponse } = require("../../utils/sendResponse");
+const { validationResult } = require("express-validator");
 
-/**
- * Get all restaurants
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+
 const getRestaurants = async (req, res) => {
     try {
         const restaurants = await Restaurant.find();
         return sendResponse(res, 200, restaurants);
     } catch (error) {
-        console.error('Error fetching restaurants:', error);
         return sendResponse(res, 500, null, 'Failed to fetch restaurants');
     }
 };
 
-/**
- * Create a new restaurant
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+ // create restaurent
 const createRestaurant = async (req, res) => {
     try {
 
-        // if (!req.file) {
-        //     return sendResponse(res, 400, null, 'Image file is required');
-        // }
-
+        
         const data = {
             ...req.body,
             logo : req.files['logo'] ? req.files['logo'][0].filename  : null,
             banner : req.files['banner'] ? req.files['banner'][0].filename  : null
         };
-        console.log('Data:', data);
-
-        const validation = createRestoValidation(data);
-        if (validation.error) {
-            return sendResponse(res, 400, null, validation.error.details[0].message);
-        }
 
         const newRestaurant = await Restaurant.create(data);
+
         return sendResponse(res, 201, newRestaurant);
+
     } catch (error) {
-        console.error('Error creating restaurant:', error);
         return sendResponse(res, 500, null, 'Failed to create restaurant');
     }
 };
 
 
-/**
- * Update an existing restaurant
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+
 const updateRestaurant = async (req, res) => {
     try {
+        // get resto id from req.params
         const { _id } = req.params;
-
+        
         const data={
             ...req.body,
             logo : req.files['logo'] ? req.files['logo'][0].filename  : null,
             banner : req.files['banner'] ? req.files['banner'][0].filename  : null
         }
         
-        const validation = createRestoValidation(data);
-        if (validation.error) {
-            return sendResponse(res, 400, null, validation.error.details[0].message);
-        }
 
         const updatedRestaurant = await Restaurant.findByIdAndUpdate(
             _id,
@@ -82,21 +59,14 @@ const updateRestaurant = async (req, res) => {
 
         return sendResponse(res, 200, updatedRestaurant);
     } catch (error) {
-        console.error('Error updating restaurant:', error);
         return sendResponse(res, 500, null, 'Failed to update restaurant');
     }
 };
 
-/**
- * Delete a restaurant
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
 const deleteRestaurant = async (req, res) => {
     try {
         
         const { _id } = req.params;
-        console.log('Restaurant ID to delete:', _id);
         const deletedRestaurant = await Restaurant.findByIdAndDelete(_id);
 
         if (!deletedRestaurant) {
@@ -105,7 +75,6 @@ const deleteRestaurant = async (req, res) => {
 
         return sendResponse(res, 204);
     } catch (error) {
-        console.error('Error deleting restaurant:', error);
         return sendResponse(res, 500, null, 'Failed to delete restaurant');
     }
 };

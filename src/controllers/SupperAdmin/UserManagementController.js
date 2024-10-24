@@ -1,9 +1,8 @@
-
-
 const User = require("../../models/User");
 const { sendResponse } = require("../../utils/sendResponse");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const { sendEmailVerification } = require("../AuthController");
 
 const getUsers = async (req, res) => {
     try {
@@ -13,8 +12,7 @@ const getUsers = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const [users, total] = await Promise.all([
-            User.find()
-                .select('-password')  // Exclude password field
+            User.find().select('-password')  // Exclude password field
                 .skip(skip)
                 .limit(limit),
             User.countDocuments()
@@ -30,32 +28,27 @@ const getUsers = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching users:', error);
         return sendResponse(res, 500, null, 'Failed to fetch users');
     }
 };
 
 const createUser = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return sendResponse(res, 422, null, 'Validation failed', errors.array());
-        }
 
+        console.log('hdhhdhdhdhd');
         const { fullName, email, password, phoneNumber, address } = req.body;
 
-        // Check if user already exists - use case-insensitive email check
-        const existingUser = await User.findOne({ 
-            email: { $regex: new RegExp(`^${email}$`, 'i') } 
+        // Check if user already exists (case-insensitive)
+        const existingUser = await User.findOne({
+            email
         });
-        
+
         if (existingUser) {
             return sendResponse(res, 409, null, 'Email already registered');
         }
 
-        // Hash password
-        const saltRounds = 12;  // Increased for better security
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        // Hash the password
+        const hashedPassword = password;
 
         // Create user with sanitized data
         const newUser = await User.create({
@@ -63,39 +56,31 @@ const createUser = async (req, res) => {
             email: email.toLowerCase(),
             password: hashedPassword,
             phoneNumber: phoneNumber.replace(/\s+/g, ''),  // Remove any whitespace
-            address: address.trim(),
-            createdAt: new Date(),
-            updatedAt: new Date()
+            address: address.trim()
         });
 
         // Remove password from response and convert to plain object
         const userResponse = newUser.toObject();
         delete userResponse.password;
 
-        return sendResponse(res, 201, userResponse, 'User created successfully');
+        // Send email verification (assuming it sends an email to the user)
+        sendEmailVerification(req, res); 
 
+        // return sendResponse(res, 201, userResponse, 'User created successfully');
     } catch (error) {
-        console.error('Error creating user:', error);
-        
         // Handle specific database errors
         if (error.name === 'MongoError' || error.name === 'MongoServerError') {
             if (error.code === 11000) {
                 return sendResponse(res, 409, null, 'Email already exists');
             }
         }
-
         return sendResponse(res, 500, null, 'Internal server error');
     }
 };
 
 const updateUser = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return sendResponse(res, 422, null, 'Validation failed', errors.array());
-        }
-
-        const userId = req.params._id;
+        const userId = req.params.id;
         const { fullName, email, password, phoneNumber, address } = req.body;
 
         // Find user by ID
@@ -105,10 +90,8 @@ const updateUser = async (req, res) => {
         }
 
         // Check if the email is being updated and if it already exists for another user
-        if (email && email.toLowerCase() !== user.email.toLowerCase()) {
-            const emailExists = await User.findOne({ 
-                email: { $regex: new RegExp(`^${email}$`, 'i') } 
-            });
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email });
             if (emailExists) {
                 return sendResponse(res, 409, null, 'Email already registered by another user');
             }
@@ -116,8 +99,7 @@ const updateUser = async (req, res) => {
 
         // Update fields, hash password if it’s being updated
         if (password) {
-            const saltRounds = 12;
-            user.password = await bcrypt.hash(password, saltRounds);
+            user.password =password;
         }
 
         user.fullName = fullName ? fullName.trim() : user.fullName;
@@ -133,16 +115,14 @@ const updateUser = async (req, res) => {
         delete userResponse.password;
 
         return sendResponse(res, 200, userResponse, 'User updated successfully');
-
     } catch (error) {
-        console.error('Error updating user:', error);
         return sendResponse(res, 500, null, 'Failed to update user');
     }
 };
 
 const deleteUser = async (req, res) => {
     try {
-        const userId = req.params._id;
+        const userId = req.params.id;
 
         // Find the user by ID and delete
         const user = await User.findByIdAndDelete(userId);
@@ -151,9 +131,7 @@ const deleteUser = async (req, res) => {
         }
 
         return sendResponse(res, 200, null, 'User deleted successfully');
-        
     } catch (error) {
-        console.error('Error deleting user:', error);
         return sendResponse(res, 500, null, 'Failed to delete user');
     }
 };
@@ -161,6 +139,6 @@ const deleteUser = async (req, res) => {
 module.exports = {
     getUsers,
     createUser,
-    updateUser,   // Export the update function
-    deleteUser    // Export the delete function
+    updateUser,
+    deleteUser
 };
