@@ -3,6 +3,7 @@ const { sendResponse } = require("../../utils/sendResponse");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const { sendEmailVerification } = require("../AuthController");
+const { registerUser } = require("../../services/userService");
 
 const getUsers = async (req, res) => {
     try {
@@ -32,51 +33,16 @@ const getUsers = async (req, res) => {
     }
 };
 
-const createUser = async (req, res) => {
+
+
+const createUser=async(req, res) => {
     try {
-
-        console.log('hdhhdhdhdhd');
-        const { fullName, email, password, phoneNumber, address } = req.body;
-
-        // Check if user already exists (case-insensitive)
-        const existingUser = await User.findOne({
-            email
-        });
-
-        if (existingUser) {
-            return sendResponse(res, 409, null, 'Email already registered');
-        }
-
-        // Hash the password
-        const hashedPassword = password;
-
-        // Create user with sanitized data
-        const newUser = await User.create({
-            fullName: fullName.trim(),
-            email: email.toLowerCase(),
-            password: hashedPassword,
-            phoneNumber: phoneNumber.replace(/\s+/g, ''),  // Remove any whitespace
-            address: address.trim()
-        });
-
-        // Remove password from response and convert to plain object
-        const userResponse = newUser.toObject();
-        delete userResponse.password;
-
-        // Send email verification (assuming it sends an email to the user)
-        sendEmailVerification(req, res); 
-
-        // return sendResponse(res, 201, userResponse, 'User created successfully');
+        await registerUser(req.body, 'livreur');
+        res.status(201).json({ message: 'User created successfully. Check your email for verification' });
     } catch (error) {
-        // Handle specific database errors
-        if (error.name === 'MongoError' || error.name === 'MongoServerError') {
-            if (error.code === 11000) {
-                return sendResponse(res, 409, null, 'Email already exists');
-            }
-        }
-        return sendResponse(res, 500, null, 'Internal server error');
+        res.status(500).json({error: error.message});
     }
-};
+}
 
 const updateUser = async (req, res) => {
     try {
