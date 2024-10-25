@@ -1,9 +1,11 @@
 const MenuItem = require('../../../models/MenuItem');
 const { DeleteMenuItemValidationSchema } = require('../../../services/Menu/Validation');
+const mongoose = require('mongoose');
 
 async function DeleteItem(req, res, next) {
     try {
-        const { id } = req.body; 
+        console.log(req.body);
+        const { id } = req.body;  
 
         const { error } = DeleteMenuItemValidationSchema.validate(req.body);
         if (error) {

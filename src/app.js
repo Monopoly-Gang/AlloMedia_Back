@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const router = require("./routes/index");
 
+
 const app = express();
 
 const corsOptions = {
@@ -16,6 +17,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("../public"));
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 
 app.use("/api" , router)

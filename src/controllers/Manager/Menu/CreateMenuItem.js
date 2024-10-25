@@ -1,6 +1,6 @@
 const express = require('express');
 const MenuItem = require('../../../models/MenuItem');
-const  ValidateMenu   = require('../../../services/Menu/Validation');
+const ValidateMenu = require('../../../services/Menu/Validation');
 const multer = require('multer');
 const mongoose = require('mongoose');
 
@@ -8,21 +8,24 @@ const mongoose = require('mongoose');
 
 async function CreateMenuItem(req, res, next) {
     try {
-        
-        const {error} = ValidateMenu.menuItemValidationSchema.validate(req.body); 
-        res.status(200);  
+        let id = req.params.id
+        console.log("rest 1 " , id);
+        const { error } = ValidateMenu.menuItemValidationSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error });
         }
-        const { name, description, price, restaurant } = req.body
-        let image 
+        console.log( "dsadsad" , req.file);
+        
+        const { name, description, price } = req.body
+        let image
         if (!req.file) {
             image = "https://example.com/logo.png"
-        }else{
+        } else {
             image = req.file.path;
         }
-        const id =new mongoose.Types.ObjectId(restaurant)
-        const Item = await MenuItem.findOne({ name , restaurant})
+        id = new mongoose.Types.ObjectId(id)
+        // console.log("rest 2" , id);
+        const Item = await MenuItem.findOne({ name, restaurant: id })
         if (Item) {
             return res.status(400).json({ message: 'Item already exists' })
         } else {

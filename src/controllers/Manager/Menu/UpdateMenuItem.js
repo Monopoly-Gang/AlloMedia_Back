@@ -4,22 +4,28 @@ const ValidateMenu = require('../../../services/Menu/Validation');
 
 async function UpdateMenuItem(req, res, next) {
     try {
+
+        // const {id} = req.params;
+        console.log(req.body);
+        console.log("req.filce", req.file);
+
         const { error } = ValidateMenu.UpdatemenuItemValidationSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
- 
-        const { id, name, description, price, restaurant } = req.body;
-
+        
         if (!id) {
-            return res.status(400).json({ message: 'Menu item ID is required' });
+            return res.status(404).json({ message: 'Menu item ID is required' });
         }
-
+        
+        const { name, description, price} = req.body;
         const updateData = { name, description, price };
+        console.log("updateData ", updateData);
         
         if (req.file) {
             updateData.image = req.file.path;
         }
+        console.log("updateData 2 ", updateData);
 
         const updatedItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
         

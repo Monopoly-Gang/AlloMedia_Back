@@ -7,8 +7,9 @@ const AllMenuItems = require('../controllers/Manager/Menu/AllMenuItems');
 const Upload = require('../middleware/Multer');
 // Define your routes
 
-Router.post('/CreateMenuItem', Upload("uploads/MenuItems" , "image"), CreateMenuItem);
+Router.post('/CreateMenuItem/:id', Upload("uploads/MenuItems" , "image"), CreateMenuItem);
 Router.post('/UpdateMenuItem',Upload("uploads/MenuItems" , "image"), UpdateMenuItem )
 Router.post('/DeleteMenuItem',DeleteMenuItem )
-Router.get('/',AllMenuItems )
+Router.get('/getMenuItems/:id',AllMenuItems )
+
 module.exports = Router;
