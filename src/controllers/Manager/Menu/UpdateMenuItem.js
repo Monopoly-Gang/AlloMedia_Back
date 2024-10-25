@@ -7,18 +7,18 @@ async function UpdateMenuItem(req, res, next) {
 
         // const {id} = req.params;
         console.log(req.body);
-        console.log("req.filce", req.file);
+        // console.log("req.file", req.file);
 
         const { error } = ValidateMenu.UpdatemenuItemValidationSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
         
-        if (!id) {
-            return res.status(404).json({ message: 'Menu item ID is required' });
-        }
+        // if (!id) {
+        //     return res.status(404).json({ message: 'Menu item ID is required' });
+        // }
         
-        const { name, description, price} = req.body;
+        const { _id , name, description, price} = req.body;
         const updateData = { name, description, price };
         console.log("updateData ", updateData);
         
@@ -27,7 +27,7 @@ async function UpdateMenuItem(req, res, next) {
         }
         console.log("updateData 2 ", updateData);
 
-        const updatedItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedItem = await MenuItem.findByIdAndUpdate(_id, updateData, { new: true });
         
         if (!updatedItem) {
             return res.status(404).json({ message: 'Item not found' });
