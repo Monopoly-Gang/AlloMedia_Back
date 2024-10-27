@@ -1,4 +1,6 @@
+const { default: mongoose } = require("mongoose");
 const Order = require("../models/Order");
+const User = require('../models/User');
 
 
 class OrderController{
@@ -6,9 +8,7 @@ class OrderController{
     async addOrder(req,res){
         try {
             const { client, restaurant, items } = req.body;
-            console.log("Received items:", req.body);
-            
-            
+               
             const formattedItems = items.map(item => ({
                 quantity: item.quantity,
                 menuItem: item.menuItem, 
@@ -31,15 +31,40 @@ class OrderController{
 
     async getOrdersByUserId(req,res){
         try{
-            const {id} = req.params;
+            const id = req.params.userId;
             const orders = await Order.find({client:id});
-            res.status(200).json({message:"Orders fetched succesfully",orders});
+            return res.status(200).json({message:"Orders fetched succesfully",orders});
         }
         catch(error){
             console.error(error);
-            req.status(500).json({message:" Failed to fetch orders",error:error.message});
+            res.status(500).json({message:" Failed to fetch orders",error:error.message});
         }
     }
+
+        async getOrderById(req,res){
+            
+            try{
+                const id =req.params.orderId;
+                const order = await Order.findById(id)
+                .populate({
+                    path: 'client',
+                    select: 'fullName email phoneNumber address' 
+                }) .populate({
+                    path: 'restaurant',
+                    select: 'name address', 
+                })
+                .populate({
+                    path: 'items.menuItem', 
+                    select: 'price description name', 
+                });
+                console.log(JSON.stringify(order, null, 2));
+                return res.status(200).json({message:"Order fetched succesfully",order});
+            }
+            catch(error){
+                console.error(error);
+                return res.status(500).json({message:" Failed to fetch order",error:error.message});
+            }
+        }
 }
 
 module.exports = new OrderController();
