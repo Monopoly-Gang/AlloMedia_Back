@@ -4,8 +4,8 @@ const orderSchema = new mongoose.Schema({
     client: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     items: [{
-        menuItem: { type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' },
-        quantity: Number
+        menuItem: { type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem', required: true }, 
+        quantity: { type: Number, required: true }
     }],
     status: {
         type: String,
