@@ -52,7 +52,27 @@ const schemas = {
         'string.empty': 'OTP is not allowed to be empty',
         'any.required': 'OTP is required',
         'string.pattern.base': 'OTP must be a 4-digit number'
-    })
+    }),
+    restaurantName: Joi.string().required().messages({
+        'string.empty': 'Restaurant name is not allowed to be empty',
+        'any.required': 'Restaurant name is required'
+    }),
+    cuisineType: Joi.string().required().messages({
+        'string.empty': 'Cuisine type is not allowed to be empty',
+        'any.required': 'Cuisine type is required'
+    }),
+    restaurantAddress: Joi.string().required().messages({
+        'string.empty': 'Restaurant address is not allowed to be empty',
+        'any.required': 'Restaurant address is required'
+    }),
+    location: Joi.string().required().messages({
+        'string.empty': 'Location is not allowed to be empty',
+        'any.required': 'Location is required'
+    }),
+    banner: Joi.string().required().messages({
+        'string.empty': 'Banner is not allowed to be empty',
+        'any.required': 'Banner is required'
+    }),
 };
 
 module.exports = (...fields) => {
