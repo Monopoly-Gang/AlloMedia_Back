@@ -1,5 +1,5 @@
 const express = require('express');
-const supperAdminRoutes = require('./SupperAdmin');
+const supperAdminRoutes = require('./restaurants');
 const authRouter = require('./auth');
 const livreur=require('./livreur')
 

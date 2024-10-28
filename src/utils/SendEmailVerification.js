@@ -4,8 +4,7 @@ const path = require("path");
 
 async function sendEmailVerification(id, email) {
     const token = jwtService.generateToken({id}, 600);
-    
-    const link = `${process.env.FRONT_APP_HOST}/verify?token=${token}`;
+    const link = `${process.env.FRONT_APP_HOST}/verify-email?token=${token}`;
     return await mailService.send(
         email,
         'Email Verification',

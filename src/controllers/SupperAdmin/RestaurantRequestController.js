@@ -1,14 +1,28 @@
 const Restaurant = require("../../models/Restaurant");
 const { sendResponse } = require("../../utils/sendResponse");
 
+
+
 const getRestaurants = async (req, res) => {
   try {
-    const restaurants = await Restaurant.find({ isApproved: false });
-    return sendResponse(res, 200, restaurants);
+      const restaurants = await Restaurant.find({ isApproved: false })
+          .populate({
+              path: 'manager',  // Changed from 'gestionnaire' to 'manager'
+              select: 'fullName email phoneNumber' 
+          })
+          .lean();
+          
+      if (!restaurants) {
+          return sendResponse(res, 404, null, 'No restaurants found');
+      }
+
+      return sendResponse(res, 200, restaurants);
   } catch (error) {
-    return sendResponse(res, 500, null, 'Failed to fetch restaurants');
+      console.error('Error fetching restaurants:', error);
+      return sendResponse(res, 500, null, `Failed to fetch restaurants: ${error.message}`);
   }
 };
+
 
 
 const approveRestaurant = async (req, res) => {

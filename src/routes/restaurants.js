@@ -13,19 +13,28 @@ const inputValidator = require("../middleware/inputValidator");
 
 router.get('/', RestoController.getRestaurants);
 
-router.post('/',  
-    upload("uploads/restos").fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'banner', maxCount: 1 }
-]), inputValidator(['name', 'cuisineType', 'address', 'location', 'manager']),RestoController.createRestaurant);
+// router.post('/',  
+//     upload("uploads/restos").fields([
+//     { name: 'logo', maxCount: 1 },
+//     { name: 'banner', maxCount: 1 }
+// ]), inputValidator(['name',"fullName", 'cuisineType', 'address', 'location']),RestoController.createRestaurant);
 
+
+
+router.post("/", 
+    upload("uploads/restos").fields([
+            { name: 'logo', maxCount: 1 },
+            { name: 'banner', maxCount: 1 }
+]), inputValidator([
+    'fullName', 'email', 'password', 'phoneNumber', 'address', 'restaurantName', 'cuisineType', 'restaurantAddress', 'location'
+]), RestoController.createRestaurant);
 
 router.put('/updateResto/:_id', upload("uploads/restos").fields([
     { name: 'logo', maxCount: 1 },
     { name: 'banner', maxCount: 1 }
 ]), RestoController.updateRestaurant);
 
-router.delete('/deleteResto/:_id', RestoController.deleteRestaurant);
+router.delete('/:id', RestoController.deleteRestaurant);
 
 // get all restos for approval
 router.get('/restosForApproval',RestaurantRequestController.getRestaurants );

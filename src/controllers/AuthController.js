@@ -8,12 +8,40 @@ const sendAuthTokens = require('../utils/sendAuthTokens');
 const { registerUser } = require('../services/userService');
 const SecurityManager = require('../utils/SecurityManager');
 const sendEmailVerification = require('../utils/sendEmailVerification');
+const addRestaurant = require('../utils/createRestaurant');
 
 class AuthController {
     async registerClient(req, res) {
         try {
-            await registerUser(req.body, 'client');
+            const registered = await registerUser(req.body, 'client');
+            if (!registered.success) return res.status(400).json({message: registered.error});
+
+            const isSent = await sendEmailVerification(registered.user._id, registered.user.email);
+            if (isSent.error) return res.status(500).json({error: isSent.error});
+
             res.status(201).json({ message: 'User created successfully. Check your email for verification' });
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async registerRestaurant(req, res) {
+        try {
+            const manageRegistered = await registerUser(req.body, 'gestionnaire');
+            if (!manageRegistered.success) return res.status(400).json({message: manageRegistered.error});
+
+            const restaurantRegistered = await addRestaurant({
+                ...req.body,
+                banner: req.files.banner ? req.files.banner[0].path : '',
+                logo: req.files.logo ? req.files.logo[0].path : ''
+            }, manageRegistered.user._id);
+            if (!restaurantRegistered.success) return res.status(400).json({message: restaurantRegistered.error});
+
+            const isSent = await sendEmailVerification(manageRegistered.user._id, manageRegistered.user.email);
+            if (isSent.error) return res.status(500).json({error: isSent.error});
+
+            res.status(201).json({ message: 'User and restaurant created successfully. Check your email for verification' });
+                
         } catch (error) {
             res.status(500).json({error: error.message});
         }
@@ -68,10 +96,10 @@ class AuthController {
             if (await SecurityManager.isNewDeviceOrLocation(user.id, req)) {
                 const otpSent = await sendOTPMail(user);
                 if (otpSent.error) return res.status(500).json({error: otpSent.error});
-                return res.status(401).json({message: 'New device or location detected. Check your email for OTP verification'});
+                return res.status(401).json({message: 'New device or location detected. Check your email for OTP verification', errorCode: 'OTP_REQUIRED'});
             }
 
-            return await sendAuthTokens(res, {id: user._id, role: user.role});
+            return await sendAuthTokens(res, {id: user._id, fullName: user.fullName, role: user.role});
 
         } catch (error) {
             res.status(500).json({error: error.message});
@@ -98,7 +126,7 @@ class AuthController {
             const user = await User.findById(userId);
             await redis.del(req.body.otp);
             await SecurityManager.updateLoginHistory(userId, req);
-            return sendAuthTokens(res, {id: user._id, role: user.role});
+            return sendAuthTokens(res, {id: user._id, fullName: user.fullName, role: user.role});
         } catch (error) {
             res.status(500).json({error: error.message});
         }
