@@ -4,7 +4,7 @@ const RestoController = require('../controllers/SupperAdmin/RestoController');
 const RestaurantRequestController = require('../controllers/SupperAdmin/RestaurantRequestController');
 const UserManagementController = require('../controllers/SupperAdmin/UserManagementController');
 
-const upload = require('../services/Multer');
+const upload = require('../services/multer');
 
 const inputValidator = require("../middleware/inputValidator");
 

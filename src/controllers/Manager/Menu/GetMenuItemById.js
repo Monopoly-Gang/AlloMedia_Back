@@ -1,6 +1,6 @@
 const MenuItem = require("../../../models/MenuItem");
 
-async function GetMenuItemById(req, res, next) {
+async function GetMenuItemById(req, res) {
     const { id } = req.params; 
     try {
         const menuItem = await MenuItem.findById(id); 
@@ -8,6 +8,8 @@ async function GetMenuItemById(req, res, next) {
         if (!menuItem) {
             return res.status(404).json({ message: "Menu item not found." });
         }
+        console.log(menuItem);
+        
 
         menuItem.image = `${process.env.IMAGE_PATH}\\${menuItem.image}`; 
         res.status(200).json(menuItem);

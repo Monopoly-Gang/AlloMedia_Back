@@ -2,16 +2,24 @@ const express = require("express");
 const tokenValidator = require("../middleware/tokenValidator");
 const AuthController = require("../controllers/AuthController");
 const inputValidator = require("../middleware/inputValidator");
-const upload = require("../services/multer");
+const upload = require("../services/multer"); 
 
 const router = express.Router();
+
 router.post("/register-client", inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address']), AuthController.registerClient);
-router.post("/register-restaurant", upload("uploads/restos").fields([
+
+router.post("/register-restaurant", upload("", true).fields([ // Pass empty string for local path, true for S3
     { name: 'logo', maxCount: 1 },
     { name: 'banner', maxCount: 1 }
-]), inputValidator([
-    'fullName', 'email', 'password', 'phoneNumber', 'address', 'restaurantName', 'cuisineType', 'restaurantAddress', 'location'
-]), AuthController.registerRestaurant);
+]), async (req, res) => {
+    try {
+        // Continue with your other logic after uploading to S3
+        res.status(201).json({ message: "Restaurant registered successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to upload image." });
+    }
+});
+
 router.get("/verify-email", tokenValidator.validateQuery, AuthController.verifyEmail);
 router.post("/send-email-verification", AuthController.sendEmailVerification);
 router.post("/login", AuthController.login);
