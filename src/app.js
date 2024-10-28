@@ -2,8 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const router = require("./routes");
-
+const routes = require("./routes");
 
 const app = express();
 
@@ -20,7 +19,6 @@ app.use(express.static("../public"));
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-
-app.use("/api" , router)
+app.use("/api", routes);
 
 module.exports = app;

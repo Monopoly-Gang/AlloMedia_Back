@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
             message: props => `Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number`
         }
     },
-    role: { type: String, enum: ['client', 'livreur', 'gestionnaire', 'super_admin'], required: true },
-    address: { type: String, required: [true, 'Address is required'] },
+    role: {type: String, enum: ['client', 'livreur', 'gestionnaire', 'super_admin'], required: true, default: 'client'},
+    address: {type: String, required: [true, 'Address is required']},
     phoneNumber: {
         type: String,
         required: [true, 'Phone number is required'],
