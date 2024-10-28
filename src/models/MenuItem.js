@@ -5,7 +5,7 @@ const menuItemSchema = new mongoose.Schema({
     description: String,
     price: { type: Number, required: true },
     image: { type: String },
-    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: false }
+    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant'}
 }, { timestamps: true });
 
 module.exports = mongoose.model('MenuItem', menuItemSchema);
