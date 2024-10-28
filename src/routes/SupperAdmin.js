@@ -10,18 +10,9 @@ const inputValidator = require("../middleware/inputValidator");
 
 
 
-// Add rate limiting for security
-const rateLimit = require('express-rate-limit');
-const createAccountLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, 
-    max: 5 // limit each IP to 5 create account requests per hour
-});
 
 router.get('/', RestoController.getRestaurants);
-// router.post('/createResto', upload("uploads/restos").fields([
-//     { name: 'logo', maxCount: 1 },
-//     { name: 'banner', maxCount: 1 }
-// ]), RestoController.createRestaurant);
+
 router.post('/',  
     upload("uploads/restos").fields([
     { name: 'logo', maxCount: 1 },
@@ -39,9 +30,9 @@ router.delete('/deleteResto/:_id', RestoController.deleteRestaurant);
 // get all restos for approval
 router.get('/restosForApproval',RestaurantRequestController.getRestaurants );
 // approve a restaurant
-router.put('/approveRestaurant/:_id', RestaurantRequestController.approveRestaurant);
+router.put('/approveRestaurant/:id', RestaurantRequestController.approveRestaurant);
 // refuse a restaurant
-router.delete('/refuseRestaurant/:_id', RestaurantRequestController.refuseRestaurant);
+router.delete('/refuseRestaurant/:id', RestaurantRequestController.refuseRestaurant);
 
 
 module.exports = router; // Utiliser module.exports
