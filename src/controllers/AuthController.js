@@ -99,7 +99,7 @@ class AuthController {
                 return res.status(401).json({message: 'New device or location detected. Check your email for OTP verification', errorCode: 'OTP_REQUIRED'});
             }
 
-            return await sendAuthTokens(res, {id: user._id, fullName: user.fullName, role: user.role});
+            return await sendAuthTokens(res, user);
 
         } catch (error) {
             res.status(500).json({error: error.message});
@@ -126,7 +126,7 @@ class AuthController {
             const user = await User.findById(userId);
             await redis.del(req.body.otp);
             await SecurityManager.updateLoginHistory(userId, req);
-            return sendAuthTokens(res, {id: user._id, fullName: user.fullName, role: user.role});
+            return await sendAuthTokens(res, user);
         } catch (error) {
             res.status(500).json({error: error.message});
         }
