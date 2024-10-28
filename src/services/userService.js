@@ -1,23 +1,22 @@
 const _ = require('lodash');
 const User = require('../models/User');
-const sendEmailVerification = require('../utils/sendEmailVerification');
 
 async function registerUser(userData, userRole) {
-    // Check for unique email
-    const emailExists = await User.findOne({ email: userData.email });
-    if (emailExists) throw new Error('Email already exists');
+    try {
+        // Check for unique email
+        const emailExists = await User.findOne({ email: userData.email });
+        if (emailExists) return {success: false, error: 'Email already exists'};
 
-    // Create new user
-    const user = await User.create({
-        ..._.pick(userData, ['fullName', 'email', 'password', 'phoneNumber', 'address']),
-        role: userRole
-    });
+        // Create new user
+        const user = await User.create({
+            ..._.pick(userData, ['fullName', 'email', 'password', 'phoneNumber', 'address']),
+            role: userRole
+        });
 
-    // Send email verification
-    const emailSent = await sendEmailVerification(user._id, user.email);
-    if (emailSent.error) throw new Error(emailSent.error);
-
-    return user;
+        return {success: true, user};
+    } catch (error) {
+        return {success: false, error: error.message};
+    }
 }
 
 module.exports = {
