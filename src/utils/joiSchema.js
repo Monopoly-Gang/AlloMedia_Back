@@ -54,31 +54,26 @@ const schemas = {
         'any.required': 'OTP is required',
         'string.pattern.base': 'OTP must be a 4-digit number'
     }),
-    name: Joi.string().required().lowercase().min(3).max(20).messages({
-        'string.min': 'name must be at least 3 characters long',
-        'string.max': 'name must be at most 30 characters long',
-        'string.empty': 'name is not allowed to be empty',
-        'any.required': 'name is required'
+    restaurantName: Joi.string().required().messages({
+        'string.empty': 'Restaurant name is not allowed to be empty',
+        'any.required': 'Restaurant name is required'
     }),
     cuisineType: Joi.string().required().messages({
-        'string.empty': 'cuisineType is not allowed to be empty',
-        'any.required': 'cuisineType is required'
+        'string.empty': 'Cuisine type is not allowed to be empty',
+        'any.required': 'Cuisine type is required'
     }),
-
-    location: Joi.string().min(3).required().messages({
-        'string.min': 'location must be at least 3 characters long',
-        'string.empty': 'location is not allowed to be empty',
-        'any.required': 'location is required'
+    restaurantAddress: Joi.string().required().messages({
+        'string.empty': 'Restaurant address is not allowed to be empty',
+        'any.required': 'Restaurant address is required'
     }),
-    banner: Joi.string().regex(/\.(jpeg|jpg|gif|png)$/).optional(),
-    logo: Joi.string().regex(/\.(jpeg|jpg|gif|png)$/).optional(),        
-    manager: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(), // Validating MongoDB ObjectId
-    isApproved: Joi.boolean().optional(),
-    menu: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)).optional() 
-
-    
-    
-
+    location: Joi.string().required().messages({
+        'string.empty': 'Location is not allowed to be empty',
+        'any.required': 'Location is required'
+    }),
+    banner: Joi.string().required().messages({
+        'string.empty': 'Banner is not allowed to be empty',
+        'any.required': 'Banner is required'
+    }),
 };
 
 module.exports = (...fields) => {
