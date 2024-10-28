@@ -27,7 +27,7 @@ const schemas = {
     password: Joi
         .string()
         .pattern(new RegExp('^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'))
-        .required()
+        // .required()
         .messages({
             'string.pattern.base': 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number',
             'string.empty': 'Password is not allowed to be empty',
