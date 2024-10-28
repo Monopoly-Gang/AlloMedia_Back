@@ -7,31 +7,18 @@ const { registerUser } = require("../../services/userService");
 
 const getUsers = async (req, res) => {
     try {
-        // Add pagination
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
-
-        const [users, total] = await Promise.all([
-            User.find().select('-password')  // Exclude password field
-                .skip(skip)
-                .limit(limit),
-            User.countDocuments()
-        ]);
+        const users = await User.find({ role: 'livreur' }) // Add the role filter for "livreurs"
+            .select('-password');  // Exclude password field
 
         return sendResponse(res, 200, {
             users,
-            pagination: {
-                currentPage: page,
-                totalPages: Math.ceil(total / limit),
-                totalUsers: total,
-                hasMore: page * limit < total
-            }
+            totalUsers: users.length, // Provide total count of livreurs
         });
     } catch (error) {
         return sendResponse(res, 500, null, 'Failed to fetch users');
     }
 };
+
 
 
 
@@ -46,6 +33,8 @@ const createUser=async(req, res) => {
 
 const updateUser = async (req, res) => {
     try {
+
+        console.log("gsqldhlqhdlhqsldhflsdhlshflshfdlhsldfldzhlshlfhlshdflh",req.body);
         const userId = req.params.id;
         const { fullName, email, password, phoneNumber, address } = req.body;
 
@@ -72,7 +61,6 @@ const updateUser = async (req, res) => {
         user.email = email ? email.toLowerCase() : user.email;
         user.phoneNumber = phoneNumber ? phoneNumber.replace(/\s+/g, '') : user.phoneNumber;
         user.address = address ? address.trim() : user.address;
-        user.updatedAt = new Date();
 
         await user.save();
 
