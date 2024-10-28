@@ -1,6 +1,6 @@
 const Restaurant = require("../models/Restaurant");
 
-async function addRestaurant(data, userId) {
+async function addRestaurant(data, userId, isApproved = false) {
   try {
     const restaurant = await Restaurant.create({
       name: data.restaurantName,
@@ -11,6 +11,7 @@ async function addRestaurant(data, userId) {
       logo: data.logo,
       manager: userId,
       menu: [],
+      isApproved,
     });
     return { success: true, restaurant };
   } catch (error) {
