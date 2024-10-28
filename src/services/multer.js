@@ -2,6 +2,7 @@ const multer = require('multer');
 const path = require('path');
 
 function Upload(destinationPath) {
+  
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       // Use the dynamic destination path
@@ -15,5 +16,4 @@ function Upload(destinationPath) {
   // Return the configured multer instance
   return multer({ storage: storage });
 }
-
 module.exports = Upload;

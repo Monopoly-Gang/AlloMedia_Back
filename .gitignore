@@ -16,3 +16,4 @@ Thumbs.db
 
 # Uploaded files
 uploads/
+# ADD THIS LINE TO IGNORE THE UPLOADS FOLDER
