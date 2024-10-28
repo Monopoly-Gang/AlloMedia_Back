@@ -25,19 +25,24 @@ class OrderController{
             return res.status(201).json({ message: 'Order created successfully', order });
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Failed to create order' });
+            return res.status(400).json({ error: 'Failed to create order' });
         }
     } 
 
     async getOrdersByUserId(req,res){
         try{
             const id = req.params.userId;
-            const orders = await Order.find({client:id});
+            if (!id || !isValidObjectId(id)) {
+                console.error("Invalid userId format");
+                return res.status(400).json({ message: "Invalid user ID format" });
+              }
+            const objectId = new mongoose.Types.ObjectId(id); 
+            const orders = await Order.find({ client: objectId });
             return res.status(200).json({message:"Orders fetched succesfully",orders});
         }
         catch(error){
             console.error(error);
-            res.status(500).json({message:" Failed to fetch orders",error:error.message});
+            res.status(400).json({message:" Failed to fetch orders",error:error.message});
         }
     }
 
@@ -62,7 +67,7 @@ class OrderController{
             }
             catch(error){
                 console.error(error);
-                return res.status(500).json({message:" Failed to fetch order",error:error.message});
+                return res.status(400).json({message:" Failed to fetch order",error:error.message});
             }
         }
 }
