@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, isValidObjectId } = require("mongoose");
 const Order = require("../models/Order");
 const User = require('../models/User');
 
@@ -6,16 +6,17 @@ const User = require('../models/User');
 class OrderController{
 
     async addOrder(req,res){
+       
         try {
-            const { client, restaurant, items } = req.body;
-               
+            
+            const { client, restaurant, items } = req.body; 
             const formattedItems = items.map(item => ({
                 quantity: item.quantity,
                 menuItem: item.menuItem, 
             }));
             
             const order = new Order({
-                client,
+                client: client.id,
                 restaurant,
                 items: formattedItems,
             });
