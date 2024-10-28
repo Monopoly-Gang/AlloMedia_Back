@@ -27,7 +27,7 @@ const schemas = {
     password: Joi
         .string()
         .pattern(new RegExp('^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'))
-        // .required()
+        .required()
         .messages({
             'string.pattern.base': 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one number',
             'string.empty': 'Password is not allowed to be empty',
@@ -54,7 +54,7 @@ const schemas = {
         'any.required': 'OTP is required',
         'string.pattern.base': 'OTP must be a 4-digit number'
     }),
-    name: Joi.string().required().lowercase().min(3).max(20).messages({
+    retaurantName: Joi.string().required().lowercase().min(3).max(20).messages({
         'string.min': 'name must be at least 3 characters long',
         'string.max': 'name must be at most 30 characters long',
         'string.empty': 'name is not allowed to be empty',

@@ -13,14 +13,6 @@ const inputValidator = require("../middleware/inputValidator");
 
 router.get('/', RestoController.getRestaurants);
 
-// router.post('/',  
-//     upload("uploads/restos").fields([
-//     { name: 'logo', maxCount: 1 },
-//     { name: 'banner', maxCount: 1 }
-// ]), inputValidator(['name',"fullName", 'cuisineType', 'address', 'location']),RestoController.createRestaurant);
-
-
-
 router.post("/", 
     upload("uploads/restos").fields([
             { name: 'logo', maxCount: 1 },
