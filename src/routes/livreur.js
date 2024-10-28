@@ -17,19 +17,18 @@ router.get('/', UserManagementController.getUsers);
 // Create a new user with rate limiting and input validation
 router.post(
     '/',
-    createAccountLimiter,
-    inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address', 'role']),
+    inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address']),
     UserManagementController.createUser
 );
 
 // Update an existing user with input validation
 router.put(
     '/:id',
-    inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address', 'role']),
+    inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address']),
     UserManagementController.updateUser
 );
 
 // Delete a user by ID
-router.delete('/delete/:id', UserManagementController.deleteUser);
+router.delete('/:id', UserManagementController.deleteUser);
 
 module.exports = router;
