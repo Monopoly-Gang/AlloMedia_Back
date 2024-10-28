@@ -2,7 +2,7 @@ const express = require("express");
 const tokenValidator = require("../middleware/tokenValidator");
 const AuthController = require("../controllers/AuthController");
 const inputValidator = require("../middleware/inputValidator");
-const upload = require("../services/multer");
+const upload = require("../services/Multer");
 
 const router = express.Router();
 router.post("/register-client", inputValidator(['fullName', 'email', 'password', 'phoneNumber', 'address']), AuthController.registerClient);

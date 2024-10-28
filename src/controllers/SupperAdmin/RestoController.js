@@ -79,9 +79,26 @@ const deleteRestaurant = async (req, res) => {
     }
 };
 
+const getRestaurantById = async (req, res) => {
+    try {
+        const { id } = req.params;         
+        const restaurant = await Restaurant.findById(id).populate('menu');
+        console.log(restaurant);
+        if (!restaurant) {
+            return sendResponse(res, 404, null, 'Restaurant not found');
+        }
+
+        return sendResponse(res, 200, restaurant);
+    } catch (error) {
+        return sendResponse(res, 500, null, 'Failed to fetch restaurant');
+    }
+};
+
+
 module.exports = {
     getRestaurants,
     createRestaurant,
     updateRestaurant,
-    deleteRestaurant
+    deleteRestaurant,
+    getRestaurantById
 };

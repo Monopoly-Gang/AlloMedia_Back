@@ -1,9 +1,10 @@
 const MenuItem = require('../../../models/MenuItem');
 
 async function AllMenuItems(req, res, next) {
-   
+   console.log("wachhhhhhhhhhhhhhh");
     const { id } = req.params;
     const menuItems = await MenuItem.find({restaurant:id});
+   
     // console.log(menuItems[0].image);
     menuItems.forEach(element => {
         element.image = `${process.env.IMAGE_PATH}\\${element.image}`;

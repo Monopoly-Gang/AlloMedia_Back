@@ -17,6 +17,7 @@ const createAccountLimiter = rateLimit({
     max: 5 // limit each IP to 5 create account requests per hour
 });
 
+router.get('/:id',RestoController.getRestaurantById);
 router.get('/', RestoController.getRestaurants);
 // router.post('/createResto', upload("uploads/restos").fields([
 //     { name: 'logo', maxCount: 1 },

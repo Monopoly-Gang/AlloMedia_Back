@@ -9,7 +9,7 @@ const restaurantSchema = new mongoose.Schema({
     logo: String,
     manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     isApproved: { type: Boolean, default: false },
-    menu: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
+    menu: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem', required: true }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Restaurant', restaurantSchema);
